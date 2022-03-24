@@ -1,0 +1,36 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
+    container_name: elasticsearch
+    environment:
+      - 'http.host=0.0.0.0'
+      - 'transport.host=127.0.0.1'
+      - 'bootstrap.memory_lock=true'
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.1
+    container_name: kibana
+    environment:
+      - 'ELASTICSEARCH_URL=http://elasticsearch:9200'
+      - 'elasticsearch.hosts=http://elasticsearch:9200'
+    ports:
+      - 5601:5601
+    networks:
+      - elastic
+    depends_on:
+      - elasticsearch
+
+volumes:
+  esdata:
+    driver: local
+
+networks:
+  elastic:
